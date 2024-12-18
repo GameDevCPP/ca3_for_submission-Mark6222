@@ -1,36 +1,25 @@
-cmake_minimum_required(VERSION 3.11)
-# Require modern C++
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 3.21)
+project(CMakeSFMLProject LANGUAGES CXX)
 
-project(Drop-Pod)
+# Enforce C++17 standard for the entire project
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS NO)
 
-#### Setup Directories ####
-#Main output directory
-SET(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
-# Ouput all DLLs from all libs into main build folder
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
+include(FetchContent)
+FetchContent_Declare(SFML
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG 2.6.x)
+FetchContent_MakeAvailable(SFML)
 
-add_custom_target(copy_resources ALL COMMAND ${CMAKE_COMMAND}
-        -E copy_directory
-        "${PROJECT_SOURCE_DIR}/res"
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/res
-        )
-
-#### Add External Dependencies ####
-# SFML - graphics library
-add_subdirectory("lib/sfml" EXCLUDE_FROM_ALL)
-#include_directories("lib/sfml/include")
-set(SFML_INCS "lib/sfml/include")
-link_directories("${CMAKE_BINARY_DIR}/lib/sfml/lib")
-
-# B2D - Box2D phyics library
+# B2D - Box2D physics library
 add_subdirectory("lib/b2d/Box2D")
-#include_directories("lib/b2d/Box2D/")
 set(B2D_INCS "lib/b2d/Box2D/")
 link_directories("${CMAKE_BINARY_DIR}/lib/sfml/lib")
 
-#### Add Engine and our own library projects####
+message("sfml lib: ${CMAKE_BINARY_DIR}/lib/sfml/lib")
+set(SFML_INCS "${CMAKE_BINARY_DIR}/lib/sfml/include")
+set(SFML_LIBS "${CMAKE_BINARY_DIR}/lib/sfml/lib")
 
 file(GLOB_RECURSE RESOURCE_FILES "res/*.*")
 ## Engine ##
@@ -45,10 +34,11 @@ add_library(lib_tile_level_loader STATIC ${SOURCE_FILES})
 target_include_directories(lib_tile_level_loader INTERFACE "${CMAKE_SOURCE_DIR}/lib_tile_level_loader/" )
 target_link_libraries(lib_tile_level_loader lib_maths sfml-graphics)
 
-# Maths lib
+# Maths library
 add_library(lib_maths INTERFACE)
 target_sources(lib_maths INTERFACE "${CMAKE_SOURCE_DIR}/lib_maths/maths.h")
-target_include_directories(lib_maths INTERFACE "${CMAKE_SOURCE_DIR}/lib_maths" SYSTEM INTERFACE ${SFML_INCS})
+target_include_directories(lib_maths INTERFACE "${CMAKE_SOURCE_DIR}/lib_maths")
+target_link_libraries(lib_maths INTERFACE sfml-system)
 
 ## ECM lib
 file(GLOB_RECURSE SOURCE_FILES lib_ecm/*.cpp lib_ecm/*.h)
@@ -56,36 +46,35 @@ add_library(lib_ecm STATIC ${SOURCE_FILES})
 target_include_directories(lib_ecm INTERFACE "${CMAKE_SOURCE_DIR}/lib_ecm" )
 target_link_libraries(lib_ecm PRIVATE lib_maths)
 
+add_executable(CMakeSFMLProject
+        src/platformer.cpp
+        src/scenes/scene_level1.cpp
+        src/scenes/scene_level2.cpp
+        src/scenes/scene_level3.cpp
+        src/scenes/scene_menu.cpp
+        src/components/cmp_player_physics.cpp
+        src/components/cmp_sprite.cpp
+        src/components/cmp_physics.cpp
+        src/components/cmp_enemy_turret.cpp
+        src/components/cmp_bullet.cpp
+        src/components/cmp_hut_player.cpp
+        src/components/cmp_enemy_ai.cpp
+        src/components/cmp_actor_movement.cpp
+        src/components/cmp_button.cpp
+        src/components/cmp_shooting.cpp
 
-################### Add Practicals Below ##########################
-
-###### Drop-Pod #######
-
-file(GLOB_RECURSE SOURCES Drop-Pod/*.cpp Drop-Pod/*.h)
-file(GLOB_RECURSE CMPNTS Drop-Pod/components/*.cpp Drop-Pod/components/*.h)
-file(GLOB_RECURSE SCENES Drop-Pod/scenes/*.cpp Drop-Pod/scenes/*.h)
-add_executable(Drop_Pod ${SOURCES} ${RESOURCE_FILES})
-source_group("components" FILES ${CMPNTS})
-source_group("resources" FILES ${RESOURCE_FILES})
-#target_include_directories(Drop_Pod SYSTEM PRIVATE ${SFML_INCS} ${B2D_INCS})
-target_link_libraries(Drop_Pod lib_engine)
-set(EXECUTABLES ${EXECUTABLES} Drop_Pod)
-# Improved resource copying
-add_custom_command(
-        TARGET Drop_Pod
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/res"  # Source directory
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res  # Destination directory (bin/res)
-        # $<TARGET_FILE_DIR:Drop_Pod>/res  # Destination debug directory
 )
-message("Resource source dir: ${PROJECT_SOURCE_DIR}/res")
-message("Resource destination dir: $<TARGET_FILE_DIR:Drop_Pod>/res")
-message("Resource destination dir: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res ")
-add_dependencies(Drop_Pod copy_resources)
+target_link_libraries(CMakeSFMLProject PRIVATE sfml-graphics sfml-window sfml-system lib_engine)
+target_include_directories(CMakeSFMLProject PRIVATE ${SFML_INCLUDE_DIR})
 
-set_target_properties(Drop_Pod
-        PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
-        ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)
-        )
+# Copy the res folder to the binary directory so resources are accessible
+file(COPY res DESTINATION ${CMAKE_BINARY_DIR}/)
 
+file(COPY res DESTINATION ${CMAKE_BINARY_DIR})
+target_compile_features(CMakeSFMLProject PRIVATE cxx_std_17)
+if (WIN32 AND BUILD_SHARED_LIBS)
+    add_custom_command(TARGET CMakeSFMLProject POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:CMakeSFMLProject> $<TARGET_FILE_DIR:CMakeSFMLProject> COMMAND_EXPAND_LISTS)
+endif()
+
+install(TARGETS CMakeSFMLProject)
