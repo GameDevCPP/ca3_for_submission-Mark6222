@@ -1,11 +1,13 @@
 #include "LevelSystem.h"
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 using namespace sf;
 
 std::map<LevelSystem::Tile, sf::Color> LevelSystem::_colours{
-        {WALL, Color::White}, {END, Color::Red}, {FLOOR, Color::Magenta}, {START, Color::Green } };
+    {WALL, Color::White}, {END, Color::Red}
+};
 
 sf::Color LevelSystem::getColor(LevelSystem::Tile t) {
     auto it = _colours.find(t);
@@ -24,21 +26,15 @@ size_t LevelSystem::_width;
 size_t LevelSystem::_height;
 
 float LevelSystem::_tileSize(100.f);
-Vector2f LevelSystem::_offset(0.0f, 0.0f);
+Vector2f LevelSystem::_offset(0.0f, 30.0f);
 // Vector2f LevelSystem::_offset(0,0);
-vector<std::unique_ptr<sf::RectangleShape>> LevelSystem::_sprites;
+vector<std::unique_ptr<sf::RectangleShape> > LevelSystem::_sprites;
 
-Texture LevelSystem::floorTexture;
-IntRect LevelSystem::floorTextureRect = { Vector2i(0, 0), Vector2i(32, 32) };
 
-Texture LevelSystem::wallTexture;
-IntRect LevelSystem::wallTextureRect = { Vector2i(0, 0), Vector2i(32, 32) };
+Texture LevelSystem::wall;
+Texture LevelSystem::crate;
 
-void LevelSystem::setTextureMap(string path) {
-    floorTexture.loadFromFile(path);
-}
-
-void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
+void LevelSystem::loadLevelFile(const std::string &path, float tileSize) {
     _tileSize = tileSize;
     size_t w = 0, h = 0;
     string buffer;
@@ -51,8 +47,11 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
         f.seekg(0);
         f.read(&buffer[0], buffer.size());
         f.close();
-    }
-    else {
+
+        // Clean buffer by removing null terminators
+        buffer.erase(remove(buffer.begin(), buffer.end(), '\0'), buffer.end());
+        cout << "File loaded and cleaned. Buffer size: " << buffer.size() << endl;
+    } else {
         throw string("Couldn't open level file: ") + path;
     }
 
@@ -61,18 +60,18 @@ void LevelSystem::loadLevelFile(const std::string& path, float tileSize) {
     for (int i = 0; i < buffer.size(); ++i) {
         const char c = buffer[i];
         if (c == '\0') { break; }
-        if (c == '\n') { // newline
-            if (w == 0) {  // if we haven't written width yet
-                w = i;       // set width
-            }
-            else if (w != (widthCheck - 1)) {
+        if (c == '\n') {
+            // newline
+            if (w == 0) {
+                // if we haven't written width yet
+                w = i; // set width
+            } else if (w != (widthCheck - 1)) {
                 throw string("non uniform width:" + to_string(h) + " ") + path;
             }
             widthCheck = 0;
             h++; // increment height
-        }
-        else {
-            temp_tiles.push_back((Tile)c);
+        } else {
+            temp_tiles.push_back((Tile) c);
         }
         ++widthCheck;
     }
@@ -100,102 +99,63 @@ void LevelSystem::buildSprites(bool optimise) {
     const auto tls = Vector2f(_tileSize, _tileSize);
     for (size_t y = 0; y < _height; ++y) {
         for (size_t x = 0; x < _width; ++x) {
-            Tile t = getTile({ x, y });
+            Tile t = getTile({x, y});
             if (t == EMPTY) {
                 continue;
             }
-            tps.push_back({ getTilePosition({x, y}), tls, getColor(t) });
+            tps.push_back({getTilePosition({x, y}), tls, getColor(t)});
         }
     }
 
     const auto nonempty = tps.size();
 
-    //The following is a refactored version of this student's Droppod code. Note that tileset is loaded once!
-// Preload textures outside the loop
-    static Texture wallTexture;
-    static bool wallTextureLoaded = false;
+    static bool crateTextureLoaded = false;
 
-    if (!wallTextureLoaded) {
-        if (!wallTexture.loadFromFile("res/img/tileset.png")) {
-            throw std::runtime_error("Failed to load texture: res/img/tileset.png");
+    if (!crateTextureLoaded) {
+        std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+
+        if (!crate.loadFromFile("res/img/Crate.png")) {
+            throw std::runtime_error("Failed to load texture: res/img/Crate.png");
         }
-        wallTextureLoaded = true;
+        if (!wall.loadFromFile("res/img/Tile.png")) {
+            throw std::runtime_error("Failed to load texture: res/img/Crate.png");
+        }
+        crateTextureLoaded = true;
     }
-
-    for (auto& t : tps) {
+    for (auto &t: tps) {
         auto s = make_unique<sf::RectangleShape>();
         s->setPosition(t.p);
         s->setSize(t.s);
-
+        s->setScale(1.f, 1.f);
+        std::cout << "Tile is: " << getTileAt(t.p) << std::endl;
         if (getTileAt(t.p) == 'f') {
-            s->setTexture(&floorTexture);
-            s->setTextureRect(floorTextureRect);
+            s->setTexture(&wall);
+            s->setTextureRect(sf::IntRect(0, 0, 40, 40));
+        } else if (getTileAt(t.p) == 's') {
+            s->setTexture(&wall);
+            s->setTextureRect(sf::IntRect(0, 0, 40, 40));
         } else {
-            s->setTexture(&wallTexture); // Use preloaded texture
-            s->setTextureRect(wallTextureRect);
+            s->setTexture(&crate); // Use preloaded texture
+            s->setTextureRect(sf::IntRect(0, 0, 40, 40));
         }
-
-        //why would moving this code after the push cause a problem, besides it not colouring the tiles??? DF.
-//        s->setFillColor(Color::Red);
-        s->setFillColor(t.c);
-        s->setFillColor(Color(rand()%128+128,0,0)); //modified from original. DF.
-
+        // s->setFillColor(t.c);
+        // s->setFillColor(Color(rand()%128+128,0,0));
+        // auto s = make_unique<sf::RectangleShape>();
+        // s->setPosition(t.p);
+        // s->setSize(t.s);
+        // s->setFillColor(Color::Red);
+        // s->setFillColor(t.c);
+        // s->setFillColor(Color(rand()%255,rand()%255,rand()%255));
         _sprites.push_back(move(s));
-
     }
-
-
-    ///** Note I left the following in as an example of problem code. It continually loads the tileset!!, instead of just loading once and using it...
-//    for (auto& t : tps) {
-//		auto s = make_unique<sf::RectangleShape>();
-//		s->setPosition(t.p);
-//		s->setSize(t.s);
-//
-//		if (getTileAt(t.p) == 'f')
-//		{
-//			s->setTexture(&floorTexture);
-//			s->setTextureRect(floorTextureRect);
-//		}
-//		else
-//		{
-//			wallTexture.loadFromFile("res/img/tileset.png");
-//			s->setTexture(&wallTexture);
-//			s->setTextureRect(wallTextureRect);
-//		}
-//
-//		_sprites.push_back(move(s));
-
-    //s->setFillColor(Color::Red);
-    //s->setFillColor(t.c);
-    // s->setFillColor(Color(rand()%255,rand()%255,rand()%255));
-    //}
 
     cout << "Level with " << (_width * _height) << " Tiles, With " << nonempty
-         << " Not Empty, using: " << _sprites.size() << " Sprites\n";
+            << " Not Empty, using: " << _sprites.size() << " Sprites\n";
 }
 
-void LevelSystem::render(RenderWindow& window) {
-    for (auto& t : _sprites) {
+void LevelSystem::render(RenderWindow &window) {
+    for (auto &t: _sprites) {
         window.draw(*t);
-    }
-}
-
-void LevelSystem::renderFloor(RenderWindow& window) {
-    // Renders tiles from the level file only if they are on the screen.
-    View view = window.getView();
-    auto res = view.getSize();
-    auto center = view.getCenter();
-
-    for (auto& t : _sprites) {
-        if (t->getPosition().x < center.x - (res.x * 0.6) || t->getPosition().x >= center.x + (res.x * 0.6)) {
-            continue;
-        }
-        if (t->getPosition().y < center.y - (res.y * 0.65) || t->getPosition().y >= center.y + (res.y * 0.5)) {
-            continue;
-        }
-        else {
-            window.draw(*t);
-        }
     }
 }
 
@@ -215,15 +175,19 @@ sf::Vector2f LevelSystem::getTilePosition(sf::Vector2ul p) {
     return (Vector2f(p.x, p.y) * _tileSize) + _offset;
 }
 
-std::vector<sf::Vector2ul> LevelSystem::findTiles(LevelSystem::Tile type) {
-    auto v = vector<sf::Vector2ul>();
-    for (size_t i = 0; i < _width * _height; ++i) {
-        if (_tiles[i] == type) {
-            v.push_back({ i % _width, i / _width });
+std::vector<Vector2ul> LevelSystem::findTiles(LevelSystem::Tile tileType) {
+    std::vector<Vector2ul> positions;
+    size_t width = getWidth();
+    size_t height = getHeight();
+    for (size_t y = 0; y < height; ++y) {
+        for (size_t x = 0; x < width; ++x) {
+            size_t index = y * width + x;
+            if (_tiles[index] == tileType) {
+                positions.push_back(Vector2ul(x, y));
+            }
         }
     }
-
-    return v;
+    return positions;
 }
 
 LevelSystem::Tile LevelSystem::getTileAt(Vector2f v) {
@@ -246,7 +210,7 @@ bool LevelSystem::isOnGrid(sf::Vector2f v) {
     return true;
 }
 
-void LevelSystem::setOffset(const Vector2f& _offset) {
+void LevelSystem::setOffset(const Vector2f &_offset) {
     LevelSystem::_offset = _offset;
     buildSprites();
 }
@@ -257,9 +221,9 @@ void LevelSystem::unload() {
     _tiles.reset();
     _width = 0;
     _height = 0;
-    _offset = { 0, 0 };
+    _offset = {0, 0};
 }
 
-const Vector2f& LevelSystem::getOffset() { return _offset; }
+const Vector2f &LevelSystem::getOffset() { return _offset; }
 
 float LevelSystem::getTileSize() { return _tileSize; }
