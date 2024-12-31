@@ -5,7 +5,7 @@
 #include "cmp_actor_movement.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-
+using namespace std;
 class Bullet : sf::Sprite {
 protected:
 	void _update(const double dt);
@@ -13,17 +13,19 @@ protected:
 	sf::Vector2f mousePos;
 	float angle;
 	int _damage;
-
 	std::shared_ptr<sf::SoundBuffer> soundHit_buffer;
 	std::shared_ptr<sf::Sound> soundHit;
+	string _groupType;
 
 public:
 	static void update(const double dt);
 	static void render();
 	static void fire(const sf::Vector2f& pos);
+	static void enemyFire(const sf::Vector2f& pos, const sf::Vector2f& playerPos);
 	static void init();
 	static void setAngle(float a, Bullet& b);
-
+	void setGroup(string group);
+    sf::FloatRect getBounds() const;
 	~Bullet() = default;
 	Bullet();
 };
@@ -39,8 +41,9 @@ public:
 	ShootingComponent() = delete;
 
 	explicit ShootingComponent(Entity* p);
-
 	void Fire();
+	std::vector<Bullet> getBullets();
+	void EnemyFire(const sf::Vector2f& playerPos);
 	void update(double dt) override;
 	void render() override;
 };

@@ -11,14 +11,12 @@ Sprite background;
 
 void MenuScene::Load() {
     menuView.reset(FloatRect(0, 0, resolution.x, resolution.y));
+
     auto backTexture = Resources::get<Texture>("background.png");
     background.setTexture(*backTexture);
     background.setPosition(-200, 0);
-    float scaleY = 1.35f;
-    float scaleX = 1.0f;
+    background.setScale(1.0f, 1.35f);
 
-    // Scale the background sprite
-    background.setScale(scaleX, scaleY);
     text.setFont(*Resources::get<sf::Font>("RobotoMono-Regular.ttf"));
     text.setCharacterSize(50);
     text.setFillColor(Color::Yellow);

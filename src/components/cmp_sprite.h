@@ -40,3 +40,22 @@ public:
     _shape.reset(new T(params...));
   }
 };
+
+class AnimationComponent : public Component {
+protected:
+  int _width, _height, _frames;
+  float _speed;
+  double elapsedTime = 0;
+  int _left, _top;
+  int frameCount;
+
+public:
+
+  AnimationComponent() = delete;
+
+  explicit AnimationComponent(Entity* p);
+
+  void update(double dt) override;
+  void setAnimation(int width, int height, int frames, float speed);
+  void render();
+};

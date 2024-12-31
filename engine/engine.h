@@ -5,6 +5,8 @@
 #include <maths.h>
 #include <mutex>
 #include <string>
+
+#include "SFML/Graphics/Sprite.hpp"
 const uint16_t gameWidth = 720;
 const uint16_t gameHeight = 1280;
 class Scene {
@@ -19,6 +21,9 @@ public:
   bool isLoaded() const;
   std::shared_ptr<Entity> makeEntity();
   EntityManager ents;
+
+  virtual EntityManager getEcm();
+
 
 protected:
   void setLoaded(bool);

@@ -13,6 +13,8 @@ public:
   float fireTime;
   std::shared_ptr<sf::SoundBuffer> soundShoot_buffer;
   std::shared_ptr<sf::Sound> soundShoot;
+  std::shared_ptr<Entity> player;
+  std::vector<std::shared_ptr<Entity>> drones;
   void UnLoad() override;
 
   void Update(const double& dt) override;

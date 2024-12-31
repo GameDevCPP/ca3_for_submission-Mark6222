@@ -1,5 +1,7 @@
 #include "ecm.h"
 
+#include <unordered_set>
+
 using namespace std;
 
 Entity::Entity(Scene* const s)
@@ -105,14 +107,25 @@ void EntityManager::render() {
   }
 }
 
-vector<shared_ptr<Entity>> EntityManager::find(const string& tag) const {
+vector<shared_ptr<Entity>> EntityManager::find(const string& tags) const {
   vector<shared_ptr<Entity>> ret;
+  std::istringstream stream(tags);
+  unordered_set<std::string> tagSet;
+  std::string tag;
+  while (std::getline(stream, tag, ',')) {
+    tagSet.insert(tag);
+  }
+
   for (auto& e : list) {
-    const auto tgs = e->_tags;
-    if (tgs.find(tag) != tgs.end()) {
-      ret.push_back(e);
+    const auto& tgs = e->_tags;
+    for (const auto& t : tagSet) {
+      if (tgs.find(t) != tgs.end()) {
+        ret.push_back(e);
+        break;
+      }
     }
   }
+
   return ret;
 }
 

@@ -62,6 +62,10 @@ add_executable(CMakeSFMLProject
         src/components/cmp_actor_movement.cpp
         src/components/cmp_button.cpp
         src/components/cmp_shooting.cpp
+        src/components/cmp_enitity_health.cpp
+        src/components/cmp_enitity_health.h
+        src/components/cmp_collision.cpp
+        src/components/cmp_collision.h
 
 )
 target_link_libraries(CMakeSFMLProject PRIVATE sfml-graphics sfml-window sfml-system lib_engine)

@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 //#include "cmp_monster.h"
+#include "cmp_enitity_health.h"
 #include "system_renderer.h"
 #include "engine.h"
 
@@ -46,9 +47,21 @@ void ShootingComponent::Fire() {
 	Bullet::fire(_parent->getPosition());
 }
 
+void ShootingComponent::EnemyFire(const Vector2f& playerPos) {
+	Bullet::enemyFire(_parent->getPosition(), playerPos);
+}
+
+std::vector<Bullet> ShootingComponent::getBullets() {
+	return bullets;
+}
+
 Bullet::Bullet()
 {
 	_damage = 34;
+}
+
+sf::FloatRect Bullet::getBounds() const {
+	return this->getLocalBounds();
 }
 
 void Bullet::init() {
@@ -92,7 +105,7 @@ void Bullet::fire(const Vector2f& pos) {
 	bulletCount = bulletCount % 256;
 	bullets[bulletCount].setPosition(pos);
 	bullets[bulletCount].isVisible = true;
-
+	bullets[bulletCount].setGroup("enemy");
 	// Sets the angle of the bullet.
 	*angleshot = atan2(mousePos.y - bullets[bulletCount].getPosition().y, mousePos.x - bullets[bulletCount].getPosition().x);
 	bullets[bulletCount].setAngle(*angleshot, bullets[bulletCount]);
@@ -105,6 +118,30 @@ void Bullet::fire(const Vector2f& pos) {
 	bullets[bulletCount].setRotation(angleInDegrees);
 
 }
+void Bullet::setGroup(string group) {
+	_groupType = group;
+}
+void Bullet::enemyFire(const sf::Vector2f& pos, const sf::Vector2f& playerPos) {
+	RenderWindow& window = Engine::GetWindow();
+
+	auto mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+
+	bulletCount++;
+	bulletCount = bulletCount % 256;
+	bullets[bulletCount].setPosition(pos);
+	bullets[bulletCount].isVisible = true;
+	bullets[bulletCount].setGroup("player");
+
+	*angleshot = atan2(playerPos.y - bullets[bulletCount].getPosition().y, playerPos.x - bullets[bulletCount].getPosition().x);
+	bullets[bulletCount].setAngle(*angleshot, bullets[bulletCount]);
+	*angleshot = atan2(playerPos.y - bullets[bulletCount].getPosition().y, playerPos.x - bullets[bulletCount].getPosition().x);
+
+	float angleInDegrees = *angleshot * (180.0f / 3.14159265f);
+
+	bullets[bulletCount].setRotation(angleInDegrees);
+
+}
+
 
 void Bullet::_update(const double dt) {
 	RenderWindow& window = Engine::GetWindow();
@@ -122,31 +159,31 @@ void Bullet::_update(const double dt) {
 		this->move(0, sin(this->angle) * 200.f * dt);
 	}
 
-//	auto ecm = level1.getEcm();
-//	auto enemies = ecm.find("enemy");
-//	auto boundingBox = getGlobalBounds();
-//
-//	for (auto enemy : enemies)
-//	{
-//		auto sprite = enemy->GetCompatibleComponent<SpriteComponent>()[0]->getSprite();
-//		auto spriteBounds = sprite.getGlobalBounds();
-//		spriteBounds.top += 40;
-//		spriteBounds.left += 40;
-//		spriteBounds.width -= 70;
-//		spriteBounds.height -= 70;
-//		if (enemy->isAlive() && spriteBounds.intersects(boundingBox))
-//		{
-//			this->isVisible = false;
-//			setPosition(-100, -100);
-//
-//			// Hit Sound
-//			soundHit_buffer = Resources::get<SoundBuffer>("Hit.wav");
-//			soundHit = make_shared<Sound>(*soundHit_buffer);
-//			soundHit->setVolume(volume);
-//			soundHit->play();
-//
-//			auto currentHealth = enemy->GetCompatibleComponent<MonsterComponent>()[0]->get_health();
-//			enemy->GetCompatibleComponent<MonsterComponent>()[0]->set_health(currentHealth - _damage);
-//		}
-//	}
+	auto ecm = level1.getEcm();
+
+	auto enemies = ecm.find(_groupType);
+	auto boundingBox = getGlobalBounds();
+
+	for (auto enemy : enemies)
+	{
+		auto sprite = enemy->GetCompatibleComponent<SpriteComponent>()[0]->getSprite();
+		auto spriteBounds = sprite.getGlobalBounds();
+		spriteBounds.top += 40;
+		spriteBounds.left += 40;
+		spriteBounds.width -= 70;
+		spriteBounds.height -= 70;
+		if (enemy->isAlive() && spriteBounds.intersects(boundingBox))
+		{
+			this->isVisible = false;
+			setPosition(-100, -100);
+			// // Hit Sound
+			// soundHit_buffer = Resources::get<SoundBuffer>("Hit.wav");
+			// soundHit = make_shared<Sound>(*soundHit_buffer);
+			// soundHit->setVolume(volume);
+			// soundHit->play();
+			enemy->GetCompatibleComponent<Health>()[0]->collisionDetected("player");
+		}
+	}
 }
+
+

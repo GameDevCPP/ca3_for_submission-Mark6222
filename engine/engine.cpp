@@ -17,6 +17,9 @@ static bool loading = false;
 static float loadingspinner = 0.f;
 static float loadingTime;
 static RenderWindow* _window;
+Sprite backgroundCrates;
+sf::Sprite crate;
+std::shared_ptr<sf::Texture> crateTexture;
 
 void Loading_update(float dt, const Scene* const scn) {
   //  cout << "Eng: Loading Screen\n";
@@ -24,7 +27,7 @@ void Loading_update(float dt, const Scene* const scn) {
     cout << "Eng: Exiting Loading Screen\n";
     loading = false;
   } else {
-    loadingspinner += 220.0f * dt;
+    loadingspinner += 500.0f * dt;
     loadingTime += dt;
   }
 }
@@ -33,15 +36,25 @@ void Loading_render() {
   // Resources::load<sf::Font>("RobotoMono-Regular.ttf");
 
   static CircleShape octagon(80, 8);
-  octagon.setOrigin(Vector2f(80, 80));
-  octagon.setRotation(degrees(loadingspinner));
-  octagon.setPosition(Vcast<float>(Engine::getWindowSize()) * .5f);
-  octagon.setFillColor(Color(255,255,255,min(255.f,40.f*loadingTime)));
+  auto backTexture = Resources::get<Texture>("background.png");
+  backgroundCrates.setTexture(*backTexture);
+  backgroundCrates.setPosition(-200, 0);
+  backgroundCrates.setScale(1.0f, 1.35f);
+
+  crateTexture = Resources::get<sf::Texture>("Crate.png");
+  crate.setTexture(*crateTexture);
+  crate.setOrigin(crateTexture.get()->getSize().x * 0.5f, crateTexture.get()->getSize().x * 0.5f);
+  crate.setRotation(degrees(loadingspinner));
+  crate.setPosition(Vcast<float>(Engine::getWindowSize()) * 0.5f);
+  crate.setScale(4.0f, 4.0f);
+  // Tint the crate with a fade effect based on loading time
+  crate.setColor(sf::Color(255, 255, 255, static_cast<sf::Uint8>(std::min(255.f, 40.f * loadingTime))));
   static Text t("Loading", *Resources::get<sf::Font>("RobotoMono-Regular.ttf"));
   t.setFillColor(Color(255,255,255,min(255.f,40.f*loadingTime)));
   t.setPosition(Vcast<float>(Engine::getWindowSize()) * Vector2f(0.4f,0.3f));
+  Renderer::queue(&backgroundCrates);
   Renderer::queue(&t);
-  Renderer::queue(&octagon);
+  Renderer::queue(&crate);
 }
 
 float frametimes[256] = {};
@@ -144,6 +157,8 @@ void Engine::ChangeScene(Scene* s) {
 }
 
 void Scene::Update(const double& dt) { ents.update(dt); }
+
+EntityManager Scene::getEcm() { return ents; }
 
 void Scene::Render() { ents.render(); }
 
