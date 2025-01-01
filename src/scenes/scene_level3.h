@@ -2,9 +2,19 @@
 
 #include "engine.h"
 
+namespace sf {
+  class SoundBuffer;
+  class Sound;
+}
+
 class Level3Scene : public Scene {
 public:
-  void Load() override;
+  float playXStart;
+  float fireTime;
+  std::shared_ptr<sf::SoundBuffer> soundShoot_buffer;
+  std::shared_ptr<sf::Sound> soundShoot;
+  std::shared_ptr<Entity> player;
+  std::vector<std::shared_ptr<Entity>> drones;  void Load() override;
 
   void UnLoad() override;
 

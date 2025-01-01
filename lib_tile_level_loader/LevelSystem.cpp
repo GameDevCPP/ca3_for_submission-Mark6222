@@ -128,7 +128,7 @@ void LevelSystem::buildSprites(bool optimise) {
         s->setSize(t.s);
         s->setScale(1.f, 1.f);
         std::cout << "Tile is: " << getTileAt(t.p) << std::endl;
-        if (getTileAt(t.p) == 'f' || getTileAt(t.p) == 'n') {
+        if (getTileAt(t.p) == 'f' || getTileAt(t.p) == 'n' || getTileAt(t.p) == 'e') {
             s->setTexture(&wall);
             s->setTextureRect(sf::IntRect(0, 0, 40, 40));
         } else if (getTileAt(t.p) == 's') {

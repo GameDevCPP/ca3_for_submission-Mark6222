@@ -41,8 +41,12 @@ bool PlayerPhysicsComponent::isGrounded() const {
 
     return false;
 }
-
+void PlayerPhysicsComponent::quickJump() {
+    setVelocity(Vector2f(getVelocity().x, 0.f));
+    impulse(Vector2f(0, -12.0f));
+}
 void PlayerPhysicsComponent::update(double dt) {
+
     const auto pos = _parent->getPosition();
     _grounded = isGrounded();
     //Teleport to start if we fall off map.

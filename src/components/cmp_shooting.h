@@ -16,6 +16,7 @@ protected:
 	std::shared_ptr<sf::SoundBuffer> soundHit_buffer;
 	std::shared_ptr<sf::Sound> soundHit;
 	string _groupType;
+	EntityManager level;
 
 public:
 	static void update(const double dt);
@@ -42,6 +43,7 @@ public:
 
 	explicit ShootingComponent(Entity* p);
 	void Fire();
+	void setLevel(EntityManager e);
 	std::vector<Bullet> getBullets();
 	void EnemyFire(const sf::Vector2f& playerPos);
 	void update(double dt) override;

@@ -144,14 +144,14 @@ void Engine::ChangeScene(Scene* s) {
   _activeScene = s;
 
   if (old != nullptr) {
-    old->UnLoad(); // todo: Unload Async
+    old->UnLoad();
   }
 
   if (!s->isLoaded()) {
     cout << "Eng: Entering Loading Screen\n";
     loadingTime =0;
     _activeScene->LoadAsync();
-    //_activeScene->Load();
+    // _activeScene->Load();
     loading = true;
   }
 }

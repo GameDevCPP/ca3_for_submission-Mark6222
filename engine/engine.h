@@ -43,9 +43,9 @@ public:
   static sf::Vector2u getWindowSize();
   static void setVsync(bool b);
   static void setView(sf::View);
+  static Scene* _activeScene;
 
 private:
-  static Scene* _activeScene;
   static std::string _gameName;
   static void Update();
   static void Render(sf::RenderWindow& window);

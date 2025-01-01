@@ -159,7 +159,7 @@ void Bullet::_update(const double dt) {
 		this->move(0, sin(this->angle) * 200.f * dt);
 	}
 
-	auto ecm = level1.getEcm();
+	auto ecm = Engine::_activeScene->getEcm();
 
 	auto enemies = ecm.find(_groupType);
 	auto boundingBox = getGlobalBounds();
