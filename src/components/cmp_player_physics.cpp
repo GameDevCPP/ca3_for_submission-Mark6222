@@ -4,6 +4,8 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/System.hpp>
 
+#include "AudioManager.h"
+// #include "../../cmake-build-debug/_deps/sfml-src/src/SFML/Window/CursorImpl.hpp"
 #include "SFML/Audio/Music.hpp"
 #include "../src/game.h"
 using namespace std;
@@ -49,14 +51,12 @@ void PlayerPhysicsComponent::update(double dt) {
 
     const auto pos = _parent->getPosition();
     _grounded = isGrounded();
-    //Teleport to start if we fall off map.
     if (pos.y > ls::getHeight() * ls::getTileSize()) {
         teleport(ls::getTilePosition(ls::findTiles(ls::START)[0]));
     }
 
     if (Keyboard::isKeyPressed(Keyboard::A) ||
         Keyboard::isKeyPressed(Keyboard::D)) {
-        // Moving Either Left or Right
         if (Keyboard::isKeyPressed(Keyboard::D)) {
             if (getVelocity().x < _maxVelocity.x)
                 impulse({(float) (dt * _groundspeed), 0});
@@ -67,7 +67,6 @@ void PlayerPhysicsComponent::update(double dt) {
             _parent->GetCompatibleComponent<SpriteComponent>()[0]->getSprite().setScale(-1.f, 1.f);
         }
     } else {
-        // Dampen X axis movement
         dampen({0.9f, 1.0f});
     }
 
@@ -103,11 +102,7 @@ void PlayerPhysicsComponent::update(double dt) {
 
             setVelocity(Vector2f(getVelocity().x, 0.f));
             impulse(Vector2f(0, jumpForce));
-            if (!Jump.openFromFile("res/sound/jump.wav")) {
-                std::cerr << "Error: Failed to load background music!" << std::endl;
-            }
-            Jump.setVolume(volume);
-            Jump.play();
+            AudioManager::playSound("jump");
         }
 
         _isChargingJump = false;
@@ -135,12 +130,7 @@ void PlayerPhysicsComponent::update(double dt) {
     }
     // Check for landing transition
     if (_grounded && !landed) { // Transition from air to ground
-        if (!land.openFromFile("res/sound/landing.wav")) {
-            std::cerr << "Error: Failed to load landing sound!" << std::endl;
-        } else {
-            land.setVolume(volume);
-            land.play();
-        }
+        AudioManager::playSound("landed");
     }
 
     landed = _grounded;

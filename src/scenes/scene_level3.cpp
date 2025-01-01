@@ -2,7 +2,6 @@
 #include "../components/cmp_physics.h"
 #include "../components/cmp_player_physics.h"
 #include "../game.h"
-#include "../components/cmp_bullet.h"
 #include <LevelSystem.h>
 #include <iostream>
 using namespace std;
@@ -13,7 +12,6 @@ using namespace sf;
 #include "../components/cmp_shooting.h"
 #include "../components/cmp_enemy_ai.h"
 
-static shared_ptr<Entity> player;
 extern shared_ptr<Entity> player;
 extern vector<shared_ptr<Entity> > drones;
 Texture spritesheet2;

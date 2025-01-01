@@ -11,8 +11,9 @@
 
 class Health : public Component {
 protected:
-    int _health;
 public:
+    int _health;
+
     explicit Health(Entity *p);
 
     Health() = delete;

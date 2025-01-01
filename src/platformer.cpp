@@ -18,6 +18,8 @@
 #include "scenes/scene_menu.h"
 #include <SFML/Audio.hpp>
 
+#include "AudioManager.h"
+
 using namespace sf;
 
 Level1Scene level1;
@@ -29,20 +31,18 @@ int volume;
 using namespace std;
 
 MenuScene menu;
-sf::Music backgroundMusic;
+// std::shared_ptr<sf::SoundBuffer> backgroundMusic = make_shared<SoundBuffer>();;
 int main() {
     resolution = Vector2i(720, 1280);
     volume = 20;
-
-    if (!backgroundMusic.openFromFile("res/sound/background.wav")) {
-        std::cerr << "Error: Failed to load background music!" << std::endl;
-        return -1;
+    bool loaded = AudioManager::playMusic("background.wav", true);
+    loaded = AudioManager::loadSound("blaze", "blaze.wav");
+    loaded = AudioManager::loadSound("jump", "jump.wav");
+    loaded = AudioManager::loadSound("landed", "landing.wav");
+    if (!loaded) {
+        std::cerr << "Failed to load sound: blaze.wav" << std::endl;
     }
-
-    backgroundMusic.setVolume(volume);
-    backgroundMusic.setLoop(true);
-    backgroundMusic.play();
-
+    AudioManager::setMusicVolume(volume);
     cout << "MenuScene Loaded!2222" << endl;
 
     Engine::Start(gameWidth, gameHeight, "Platformer", &menu);

@@ -46,6 +46,13 @@ add_library(lib_ecm STATIC ${SOURCE_FILES})
 target_include_directories(lib_ecm INTERFACE "${CMAKE_SOURCE_DIR}/lib_ecm" )
 target_link_libraries(lib_ecm PRIVATE lib_maths)
 
+# AudioManager library
+file(GLOB_RECURSE SOURCE_FILES lib_audio/*.cpp lib_audio/*.h)
+add_library(lib_audio STATIC ${SOURCE_FILES})
+target_include_directories(lib_audio PUBLIC "${CMAKE_SOURCE_DIR}/lib_audio/")
+target_include_directories(lib_audio PUBLIC "${CMAKE_SOURCE_DIR}/engine/")
+target_link_libraries(lib_audio PRIVATE sfml-audio)
+
 add_executable(CMakeSFMLProject
         src/platformer.cpp
         src/scenes/scene_level1.cpp
@@ -55,9 +62,6 @@ add_executable(CMakeSFMLProject
         src/components/cmp_player_physics.cpp
         src/components/cmp_sprite.cpp
         src/components/cmp_physics.cpp
-        src/components/cmp_enemy_turret.cpp
-        src/components/cmp_bullet.cpp
-        src/components/cmp_hut_player.cpp
         src/components/cmp_enemy_ai.cpp
         src/components/cmp_actor_movement.cpp
         src/components/cmp_button.cpp
@@ -66,10 +70,15 @@ add_executable(CMakeSFMLProject
         src/components/cmp_enitity_health.h
         src/components/cmp_collision.cpp
         src/components/cmp_collision.h
+        src/components/cmp_text.cpp
 
 )
-target_link_libraries(CMakeSFMLProject PRIVATE sfml-graphics sfml-window sfml-system lib_engine)
+target_link_libraries(CMakeSFMLProject PRIVATE lib_audio sfml-graphics sfml-window sfml-system lib_engine)
 target_include_directories(CMakeSFMLProject PRIVATE ${SFML_INCLUDE_DIR})
+target_include_directories(CMakeSFMLProject PRIVATE ${SFML_INCLUDE_DIR})
+target_include_directories(CMakeSFMLProject PRIVATE "${CMAKE_SOURCE_DIR}/lib_audio/")
+target_include_directories(CMakeSFMLProject PRIVATE "${CMAKE_SOURCE_DIR}/lib_tile_level_loader/")
+target_include_directories(CMakeSFMLProject PRIVATE "${CMAKE_SOURCE_DIR}/lib_ecm/")
 
 # Copy the res folder to the binary directory so resources are accessible
 file(COPY res DESTINATION ${CMAKE_BINARY_DIR}/)
