@@ -6,57 +6,54 @@
 #include <mutex>
 #include <string>
 
+#include "SFML/Graphics/Sprite.hpp"
+const uint16_t gameWidth = 720;
+const uint16_t gameHeight = 1280;
 class Scene {
 public:
-	Scene() = default;
-	virtual ~Scene();
-	virtual void Load() = 0;
-	virtual void LoadAsync();
-	virtual void UnLoad();
-	virtual void Update(const double& dt);
-	virtual void Render();
-	bool isLoaded() const;
+  Scene() = default;
+  virtual ~Scene();
+  virtual void Load() = 0;
+  virtual void LoadAsync();
+  virtual void UnLoad();
+  virtual void Update(const double& dt);
+  virtual void Render();
+  bool isLoaded() const;
+  std::shared_ptr<Entity> makeEntity();
+  EntityManager ents;
 
-	std::shared_ptr<Entity> makeEntity();
-	void addEntity(std::shared_ptr<Entity> entity);
+  virtual EntityManager getEcm();
 
-	EntityManager ents;
-	virtual EntityManager getEcm();
 
 protected:
-	void setLoaded(bool);
+  void setLoaded(bool);
 private:
-	mutable bool _loaded;
-	mutable std::future<void> _loaded_future;
-	mutable std::mutex _loaded_mtx;
+  mutable bool _loaded;
+  mutable std::future<void> _loaded_future;
+  mutable std::mutex _loaded_mtx;
 };
 
 class Engine {
 public:
-
-	Engine() = delete;
-	static void Start(unsigned int width, unsigned int height,
-		const std::string& gameName, Scene* scn);
-	static void ChangeScene(Scene*);
-	static sf::RenderWindow& GetWindow();
-	static sf::Vector2u getWindowSize();
-	static void setVsync(bool b);
-	static void setView(sf::View);
-	static void moveView(sf::Vector2f);
-	static void changeResolution(int x, int y);
-
-	static sf::Vector2f flocking(Entity* thisEnemy, sf::Vector2f toPlayer);
+  Engine() = delete;
+  static void Start(unsigned int width, unsigned int height,
+                    const std::string& gameName, Scene* scn);
+  static void ChangeScene(Scene*);
+  static sf::RenderWindow& GetWindow();
+  static sf::Vector2u getWindowSize();
+  static void setVsync(bool b);
+  static void setView(sf::View);
+  static Scene* _activeScene;
 
 private:
-	static Scene* _activeScene;
-	static std::string _gameName;
-	static void Update();
-	static void Render(sf::RenderWindow& window);
+  static std::string _gameName;
+  static void Update();
+  static void Render(sf::RenderWindow& window);
 };
 
 namespace timing {
-	// Return time since Epoc
-	long long now();
-	// Return time since last() was last called.
-	long long last();
+// Return time since Epoc
+long long now();
+// Return time since last() was last called.
+long long last();
 } // namespace timing
