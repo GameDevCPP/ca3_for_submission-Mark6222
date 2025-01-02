@@ -7,77 +7,80 @@
 #include <LevelSystem.h>
 #include <iostream>
 
+#include "AudioManager.h"
 #include "../components/cmp_collision.h"
 #include "../components/cmp_enitity_health.h"
 #include "../components/cmp_player_physics.h"
 #include "../components/cmp_sprite.h"
 #include "../components/cmp_shooting.h"
+#include "../components/cmp_spider_ai.h"
+#include "../components/cmp_text.h"
 
 using namespace std;
 using namespace sf;
 extern shared_ptr<Entity> player;
-extern vector<shared_ptr<Entity> > drones;
-Texture spritesheet3;
-Texture droneSpritesheet3;
+extern vector<shared_ptr<Entity> > spiders;
+Texture spritesheet2;
+Texture spiderSpritesheet2;
 
 void Level2Scene::Load() {
-    soundShoot_buffer = make_shared<SoundBuffer>();
-    soundShoot = make_shared<Sound>();
-    fireTime = 0.f;
-    soundShoot_buffer->loadFromFile("res/sound/blaze.wav");
-    if (soundShoot_buffer) {
-        soundShoot = make_shared<Sound>(*soundShoot_buffer);
-        soundShoot->setVolume(volume);
-    }
+    Engine::_activeScene->ents.list.clear();
     ls::loadLevelFile("res/level_2.txt", 40.0f);
     auto ho = Engine::getWindowSize().y - (ls::getHeight() * 40.f);
     ls::setOffset(Vector2f(0, ho));
+    auto e = level1.getEcm();
+    Color green = Color::Green;
+
     // Create player
-    auto e = level2.getEcm();
     {
-        if (!spritesheet3.loadFromFile("res/img/Jump.png")) {
+        if (!spritesheet2.loadFromFile("res/img/Jump.png")) {
             cerr << "Failed to load spritesheet!" << std::endl;
         }
         player = makeEntity();
         player->addTag("player");
-        player->setPosition(Vector2f(playXStart, ls::getTilePosition(ls::findTiles(ls::START)[0]).y));
+        player->setPosition(ls::getTilePosition(ls::findTiles(ls::START)[0]));
         auto s = player->addComponent<SpriteComponent>();
-        s->setTexure(std::make_shared<Texture>(spritesheet3));
+        s->setTexure(std::make_shared<Texture>(spritesheet2));
         s->setTexureRect(0, 0, 27, 26);
         s->getSprite().setOrigin(27 / 2.0f, 26 / 2.0f);
-        auto p = player->addComponent<PlayerPhysicsComponent>(Vector2f(26.f, 26.f));
-        p->quickJump();
+        player->addComponent<PlayerPhysicsComponent>(Vector2f(26.f, 26.f));
         player->addComponent<ShootingComponent>();
         auto h = player->addComponent<Health>();
-        h->setHealth(10);
+        h->setHealth(10, "player");
         auto c = player->addComponent<CollisionComponent>();
         c->setCollision("player", "enemy", e);
-    }
-    {
+    } {
+        kills = makeEntity();
+        kills->addTag("kills");
+        kills->setPosition(sf::Vector2f(60, gameHeight - 80));
+        auto pos = ls::findTiles(ls::START)[0];
+        auto t = kills->addComponent<TextComponent>("Health: ");
+        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green);
+    } {
         // create enmey
-        if (!droneSpritesheet3.loadFromFile("res/img/Drone2.png")) {
+        if (!spiderSpritesheet2.loadFromFile("res/img/spider2.png")) {
             cerr << "Failed to load spritesheet!" << std::endl;
         }
         for (int i = 0; i < ls::findTiles(ls::ENEMY).size(); i++) {
-            shared_ptr<Entity> drone;
-            drone = makeEntity();
-            drone->addTag("enemy");
-            drone->setPosition(ls::getTilePosition(ls::findTiles(ls::ENEMY)[i]));
-            auto s = drone->addComponent<SpriteComponent>();
-            s->setTexure(std::make_shared<Texture>(droneSpritesheet3));
-            s->setTexureRect(0, 0, 200, 200);
-            s->getSprite().setOrigin(40 / 2.0f, 40 / 2.0f);
-            s->getSprite().setScale(Vector2f(0.4f, 0.4f));
-            auto a = drone->addComponent<AnimationComponent>();
-            a->setAnimation(800, 200, 4, 0.2f);
-            auto ai = drone->addComponent<EnemyAIComponent>();
+            shared_ptr<Entity> spider;
+            spider = makeEntity();
+            spider->addTag("enemy");
+            spider->setPosition(ls::getTilePosition(ls::findTiles(ls::ENEMY)[i]));
+            auto s = spider->addComponent<SpriteComponent>();
+            s->setTexure(std::make_shared<Texture>(spiderSpritesheet2));
+            s->setTexureRect(0, 0, 30, 30);
+            s->getSprite().setOrigin(30 / 2.0f, 30 / 2.0f);
+            // s->getSprite().setScale(Vector2f(0.4f, 0.4f));
+            auto a = spider->addComponent<AnimationComponent>();
+            a->setAnimation(180, 30, 6, 0.2f);
+            auto ai = spider->addComponent<SpiderAi>();
             ai->setPlayer(player);
-            drone->addComponent<ShootingComponent>();
-            auto h = drone->addComponent<Health>();
-            h->setHealth(4);
-            auto c = drone->addComponent<CollisionComponent>();
+            auto h = spider->addComponent<Health>();
+            h->setHealth(4, "spider");
+            auto c = spider->addComponent<CollisionComponent>();
             c->setCollision("enemy", "player", e);
-            drones.push_back(drone);
+            spider->addComponent<TextComponent>("0");
+            spiders.push_back(spider);
         }
     }
 
@@ -107,6 +110,7 @@ void Level2Scene::UnLoad() {
     ls::unload();
     Scene::UnLoad();
 }
+
 void Level2Scene::Update(const double &dt) {
     Scene::Update(dt);
 
@@ -117,6 +121,13 @@ void Level2Scene::Update(const double &dt) {
         // level2.UnLoad();
         // Engine::ChangeScene((Scene *) &level1);
         player->GetCompatibleComponent<PlayerPhysicsComponent>()[0].get()->quickJump();
+    }
+    Color red = Color::Red;
+    kills->GetCompatibleComponent<TextComponent>()[0]->SetText(
+        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red);
+    for (const auto &spider: spiders) {
+        spider->GetCompatibleComponent<TextComponent>()[0]->SetText(
+            std::to_string(spider->GetCompatibleComponent<Health>()[0]->_health), red);
     }
     if (ls::getTileAt(pp) == ls::END) {
         Engine::ChangeScene((Scene *) &level3);
@@ -129,7 +140,7 @@ void Level2Scene::Update(const double &dt) {
     if (fireTime <= 0 && Mouse::isButtonPressed(Mouse::Left)) {
         player->GetCompatibleComponent<ShootingComponent>()[0]->Fire();
         fireTime = 0.5f;
-        soundShoot->play();
+        AudioManager::playSound("blaze");
     }
 }
 

@@ -46,7 +46,7 @@ void Level1Scene::Load() {
         player->addComponent<PlayerPhysicsComponent>(Vector2f(26.f, 26.f));
         player->addComponent<ShootingComponent>();
         auto h = player->addComponent<Health>();
-        h->setHealth(10);
+        h->setHealth(10, "player");
         auto c = player->addComponent<CollisionComponent>();
         c->setCollision("player", "enemy", e);
     } {
@@ -77,7 +77,7 @@ void Level1Scene::Load() {
             ai->setPlayer(player);
             drone->addComponent<ShootingComponent>();
             auto h = drone->addComponent<Health>();
-            h->setHealth(4);
+            h->setHealth(4, "enemy");
             auto c = drone->addComponent<CollisionComponent>();
             c->setCollision("enemy", "player", e);
             drone->addComponent<TextComponent>("0");
@@ -120,6 +120,8 @@ void Level1Scene::Update(const double &dt) {
             std::to_string(drone->GetCompatibleComponent<Health>()[0]->_health), red);
     }
     if (ls::getTileAt(player->getPosition()) == ls::END) {
+        level2.UnLoad();
+        Engine::_activeScene->ents.list.clear();
         level2.playXStart = player->getPosition().x;
         Engine::ChangeScene((Scene *) &level2);
     }
@@ -129,6 +131,7 @@ void Level1Scene::Update(const double &dt) {
     if (fireTime <= 0 && Mouse::isButtonPressed(Mouse::Left)) {
         player->GetCompatibleComponent<ShootingComponent>()[0]->Fire();
         fireTime = 0.5f;
+
         AudioManager::playSound("blaze");
     }
     Scene::Update(dt);

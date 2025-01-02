@@ -14,7 +14,9 @@ public:
   std::shared_ptr<sf::SoundBuffer> soundShoot_buffer;
   std::shared_ptr<sf::Sound> soundShoot;
   std::shared_ptr<Entity> player;
-  std::vector<std::shared_ptr<Entity>> drones;
+  std::vector<std::shared_ptr<Entity>> spiders;
+  std::shared_ptr<Entity> kills;
+
   void Load() override;
 
   void UnLoad() override;

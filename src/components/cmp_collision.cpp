@@ -13,7 +13,8 @@ class EntityHealth;
 
 void CollisionComponent::update(double dt) {
     elapsedTime += dt;
-    auto entities = _level.find(_masks);
+    auto ecm = Engine::_activeScene->getEcm();
+    auto entities = ecm.find(_masks);
     auto boundingBox = _parent->GetCompatibleComponent<SpriteComponent>()[0]->getSprite().getGlobalBounds();
     auto eh = _parent->GetCompatibleComponent<Health>()[0];
     for (auto entity : entities) {
@@ -22,7 +23,7 @@ void CollisionComponent::update(double dt) {
 
         if (spriteBounds.intersects(boundingBox)) {
             if (elapsedTime >= 1.0) {
-                eh->collisionDetected(_group);
+                eh->collisionDetected(_group, _masks);
                 elapsedTime = 0.0;
             }
         }

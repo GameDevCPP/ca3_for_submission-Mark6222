@@ -71,6 +71,8 @@ add_executable(CMakeSFMLProject
         src/components/cmp_collision.cpp
         src/components/cmp_collision.h
         src/components/cmp_text.cpp
+        src/components/cmp_spider_ai.cpp
+        src/components/cmp_spider_ai.h
 
 )
 target_link_libraries(CMakeSFMLProject PRIVATE lib_audio sfml-graphics sfml-window sfml-system lib_engine)

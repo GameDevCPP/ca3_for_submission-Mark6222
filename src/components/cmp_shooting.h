@@ -16,7 +16,10 @@ protected:
 	std::shared_ptr<sf::SoundBuffer> soundHit_buffer;
 	std::shared_ptr<sf::Sound> soundHit;
 	string _groupType;
+	string _mask;
+
 	EntityManager level;
+	double elapsedTime = 0.0;
 
 public:
 	static void update(const double dt);
@@ -25,7 +28,7 @@ public:
 	static void enemyFire(const sf::Vector2f& pos, const sf::Vector2f& playerPos);
 	static void init();
 	static void setAngle(float a, Bullet& b);
-	void setGroup(string group);
+	void setGroup(string group, string mask);
     sf::FloatRect getBounds() const;
 	~Bullet() = default;
 	Bullet();

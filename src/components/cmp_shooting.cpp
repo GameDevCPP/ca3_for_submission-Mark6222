@@ -105,7 +105,7 @@ void Bullet::fire(const Vector2f& pos) {
 	bulletCount = bulletCount % 256;
 	bullets[bulletCount].setPosition(pos);
 	bullets[bulletCount].isVisible = true;
-	bullets[bulletCount].setGroup("enemy");
+	bullets[bulletCount].setGroup("player", "enemy");
 	// Sets the angle of the bullet.
 	*angleshot = atan2(mousePos.y - bullets[bulletCount].getPosition().y, mousePos.x - bullets[bulletCount].getPosition().x);
 	bullets[bulletCount].setAngle(*angleshot, bullets[bulletCount]);
@@ -118,8 +118,9 @@ void Bullet::fire(const Vector2f& pos) {
 	bullets[bulletCount].setRotation(angleInDegrees);
 
 }
-void Bullet::setGroup(string group) {
+void Bullet::setGroup(string group, string mask) {
 	_groupType = group;
+	_mask = mask;
 }
 void Bullet::enemyFire(const sf::Vector2f& pos, const sf::Vector2f& playerPos) {
 	RenderWindow& window = Engine::GetWindow();
@@ -130,7 +131,7 @@ void Bullet::enemyFire(const sf::Vector2f& pos, const sf::Vector2f& playerPos) {
 	bulletCount = bulletCount % 256;
 	bullets[bulletCount].setPosition(pos);
 	bullets[bulletCount].isVisible = true;
-	bullets[bulletCount].setGroup("player");
+	bullets[bulletCount].setGroup("enemy", "player");
 
 	*angleshot = atan2(playerPos.y - bullets[bulletCount].getPosition().y, playerPos.x - bullets[bulletCount].getPosition().x);
 	bullets[bulletCount].setAngle(*angleshot, bullets[bulletCount]);
@@ -144,6 +145,7 @@ void Bullet::enemyFire(const sf::Vector2f& pos, const sf::Vector2f& playerPos) {
 
 
 void Bullet::_update(const double dt) {
+	elapsedTime += dt;
 	RenderWindow& window = Engine::GetWindow();
 	const View view = window.getView();
 
@@ -161,7 +163,7 @@ void Bullet::_update(const double dt) {
 
 	auto ecm = Engine::_activeScene->getEcm();
 
-	auto enemies = ecm.find(_groupType);
+	auto enemies = ecm.find(_mask);
 	auto boundingBox = getGlobalBounds();
 
 	for (auto enemy : enemies)
@@ -181,7 +183,9 @@ void Bullet::_update(const double dt) {
 			// soundHit = make_shared<Sound>(*soundHit_buffer);
 			// soundHit->setVolume(volume);
 			// soundHit->play();
-			enemy->GetCompatibleComponent<Health>()[0]->collisionDetected("player");
+			if (elapsedTime > 15.0) {
+				enemy->GetCompatibleComponent<Health>()[0]->collisionDetected(_groupType, "bullet");
+			}
 		}
 	}
 }

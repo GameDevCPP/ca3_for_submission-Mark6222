@@ -1,9 +1,9 @@
 weeeeeeeeeeeeeeeew
-wffffffffffffffffw
+wffffffffnfffffffw
 wffffffffffffwfffw
 wffffffffffffffffw
 wfffffwwwffffffffw
-wffffffffffffffffw
+wffnfffffffffffffw
 wffffffffffffffffw
 wffffffffffwwwfffw
 wffffffffffffffffw
@@ -11,7 +11,7 @@ wfwwwffffffffffffw
 wffffffffffffffffw
 wffffffffffffffffw
 wffffffwwwfffffffw
-wffffffffffffffffw
+wffffffffffffnfffw
 wffffffffffffffffw
 wffwwwfffffffffffw
 wffffffffffffffffw
@@ -19,7 +19,7 @@ wffffffffffffffffw
 wffffffffffffwwwfw
 wffffffffffffffffw
 wffwwwfffffffffffw
-wffffffffffffwwwfw
+wfffffnffffffwwwfw
 wffffffffffffffffw
 wffffffffffffffffw
 wffffffwwwfffffffw

@@ -14,17 +14,25 @@ void Health::update(double dt) {
     }
 }
 
-void Health::collisionDetected(std::string group) {
-    std::cout << "Collision detected: " << group << std::endl;
-    if (group == "player") {
+void Health::collisionDetected(std::string group, std::string mask) {
+    std::cout << "Collision detected group: " << group << " mask: " << mask << " _group: " << _group << std::endl;
+    if (mask == "enemy" && group == "player") {
         _health = _health - 1;
-    } else if (group == "enemy") {
+    }
+    if (mask == "bullet" && group == "player" && _group != "spider" && _group == "enemy") {
+        _health = _health - 1;
+    }
+    if (mask == "bullet" && group == "enemy" && _group != "spider" && _group == "player") {
+        _health = _health - 1;
+    }
+    if (mask == "bullet" && group == "player" && _group == "spider" && _group != "player") {
         _health = _health - 1;
     }
 }
 
-void Health::setHealth(int health) {
+void Health::setHealth(int health, std::string group) {
     _health = health;
+    _group = group;
 }
 
 int Health::getHealth() {
