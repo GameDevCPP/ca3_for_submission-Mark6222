@@ -24,6 +24,7 @@ Texture spritesheet2;
 Texture spiderSpritesheet2;
 
 void Level2Scene::Load() {
+    level2.ents.list.clear();
     Engine::_activeScene->ents.list.clear();
     ls::loadLevelFile("res/level_2.txt", 40.0f);
     auto ho = Engine::getWindowSize().y - (ls::getHeight() * 40.f);
@@ -64,7 +65,7 @@ void Level2Scene::Load() {
         for (int i = 0; i < ls::findTiles(ls::ENEMY).size(); i++) {
             shared_ptr<Entity> spider;
             spider = makeEntity();
-            spider->addTag("enemy");
+            spider->addTag("spider");
             spider->setPosition(ls::getTilePosition(ls::findTiles(ls::ENEMY)[i]));
             auto s = spider->addComponent<SpriteComponent>();
             s->setTexure(std::make_shared<Texture>(spiderSpritesheet2));
@@ -78,7 +79,7 @@ void Level2Scene::Load() {
             auto h = spider->addComponent<Health>();
             h->setHealth(4, "spider");
             auto c = spider->addComponent<CollisionComponent>();
-            c->setCollision("enemy", "player", e);
+            c->setCollision("spider", "player", e);
             spider->addComponent<TextComponent>("0");
             spiders.push_back(spider);
         }

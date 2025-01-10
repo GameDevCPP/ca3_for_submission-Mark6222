@@ -19,13 +19,16 @@ void Health::collisionDetected(std::string group, std::string mask) {
     if (mask == "enemy" && group == "player") {
         _health = _health - 1;
     }
-    if (mask == "bullet" && group == "player" && _group != "spider" && _group == "enemy") {
+    else if (mask == "bullet" && group == "player" && _group == "spider") {
         _health = _health - 1;
     }
-    if (mask == "bullet" && group == "enemy" && _group != "spider" && _group == "player") {
+    else if (mask == "bullet" && group == "player" && _group != "spider" && _group == "enemy") {
         _health = _health - 1;
     }
-    if (mask == "bullet" && group == "player" && _group == "spider" && _group != "player") {
+    else if (mask == "bullet" && group == "enemy" && _group != "spider" && _group == "player") {
+        _health = _health - 1;
+    }
+    else if (mask == "bullet" && group == "player" && _group != "spider" && _group != "player") {
         _health = _health - 1;
     }
 }

@@ -23,6 +23,10 @@ extern shared_ptr<Entity> kills;
 Texture spritesheet;
 Texture droneSpritesheet;
 void Level1Scene::Load() {
+    Engine::_activeScene->ents.list.clear();
+    level2.ents.list.clear();
+
+
     cout << " Scene 1 Load" << endl;
     ls::loadLevelFile("res/level_1.txt", 40.0f);
 
@@ -123,6 +127,7 @@ void Level1Scene::Update(const double &dt) {
         level2.UnLoad();
         Engine::_activeScene->ents.list.clear();
         level2.playXStart = player->getPosition().x;
+        level2.ents.list.clear();
         Engine::ChangeScene((Scene *) &level2);
     }
 

@@ -47,6 +47,16 @@ void PlayerPhysicsComponent::quickJump() {
     setVelocity(Vector2f(getVelocity().x, 0.f));
     impulse(Vector2f(0, -12.0f));
 }
+void PlayerPhysicsComponent::knockback(const sf::Vector2f& direction, float force) {
+    Vector2f Direction = direction;
+    float magnitude = sqrt(Direction.x * Direction.x + Direction.y * Direction.y);
+
+    if (magnitude != 0) {
+        Direction /= magnitude;
+    }
+
+    impulse(Direction * force);
+}
 void PlayerPhysicsComponent::update(double dt) {
 
     const auto pos = _parent->getPosition();

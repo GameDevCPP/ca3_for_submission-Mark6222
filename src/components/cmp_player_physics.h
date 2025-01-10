@@ -16,5 +16,6 @@ public:
 
   explicit PlayerPhysicsComponent(Entity* p, const sf::Vector2f& size);
   void quickJump();
+  void knockback(const sf::Vector2f& direction, float force);
   PlayerPhysicsComponent() = delete;
 };

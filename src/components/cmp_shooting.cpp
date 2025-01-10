@@ -105,7 +105,16 @@ void Bullet::fire(const Vector2f& pos) {
 	bulletCount = bulletCount % 256;
 	bullets[bulletCount].setPosition(pos);
 	bullets[bulletCount].isVisible = true;
-	bullets[bulletCount].setGroup("player", "enemy");
+	auto activeScene = Engine::_activeScene;
+	if (level1.isLoaded()) {
+		bullets[bulletCount].setGroup("player", "enemy");
+
+	}else if (level2.isLoaded()) {
+		bullets[bulletCount].setGroup("player", "spider");
+
+	}else if (level3.isLoaded()) {
+		bullets[bulletCount].setGroup("player", "enemy");
+	}
 	// Sets the angle of the bullet.
 	*angleshot = atan2(mousePos.y - bullets[bulletCount].getPosition().y, mousePos.x - bullets[bulletCount].getPosition().x);
 	bullets[bulletCount].setAngle(*angleshot, bullets[bulletCount]);
