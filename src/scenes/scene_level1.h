@@ -2,7 +2,8 @@
 
 #include "engine.h"
 #include <SFML/Audio.hpp>
-
+#include <iostream>
+#include <filesystem>
 using namespace sf;
 
 class Level1Scene : public Scene {

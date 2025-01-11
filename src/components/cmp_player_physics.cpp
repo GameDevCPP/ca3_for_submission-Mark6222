@@ -108,7 +108,8 @@ void PlayerPhysicsComponent::update(double dt) {
         _grounded = isGrounded();
         if (_grounded) {
             float chargeRatio = _jumpChargeTime / _maxChargeTime;
-            float jumpForce = _minJumpForce + chargeRatio * (_maxJumpForce - _minJumpForce);
+            cout << "jump height" << _jumpheight << endl;
+            float jumpForce = _minJumpForce + chargeRatio * (_jumpheight - _minJumpForce);
 
             setVelocity(Vector2f(getVelocity().x, 0.f));
             impulse(Vector2f(0, jumpForce));
@@ -146,7 +147,28 @@ void PlayerPhysicsComponent::update(double dt) {
     landed = _grounded;
     PhysicsComponent::update(dt);
 }
+void PlayerPhysicsComponent::init(const std::string &path) {
+    ifstream file(path);
+    // file.open(path);
+    if (!file.good()) {
+        throw std::runtime_error("Failed to open file: " + path);
+    }
+    std::unordered_map<std::string, std::string> config;
+    std::string line, parameter, value;
+    std::getline(file, line);
 
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        if (std::getline(ss, parameter, ',') && std::getline(ss, value, ',')) {
+            config[parameter] = value;
+        }
+    }
+    file.close();
+
+    std::cout << "Player Speed: " << config["player_speed"] << std::endl;
+    _groundspeed = stof(config["player_speed"]);
+    _jumpheight = stof(config["jump_height"]);
+}
 PlayerPhysicsComponent::PlayerPhysicsComponent(Entity *p,
                                                const Vector2f &size)
     : PhysicsComponent(p, true, size) {

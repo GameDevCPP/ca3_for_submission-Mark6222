@@ -49,5 +49,5 @@ int main() {
 
     cout << "MenuScene Loaded!2222" << endl;
 
-    Engine::Start(gameWidth, gameHeight, "Platformer", &level3);
+    Engine::Start(gameWidth, gameHeight, "Platformer", &menu);
 }

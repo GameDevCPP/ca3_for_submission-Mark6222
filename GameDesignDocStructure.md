@@ -2,6 +2,8 @@ Mark Hogan
 20098168
 # Game Design document
 
+Video: https://youtu.be/0v3sHfwczBA 
+
 In the following document, if you used a particular game design pattern in a section, please describe it (a brief description will do) and how you used it. Code snippets may help with this.
 In addition to this outline, I have an example of short design document from Richard McKenna titled: "Spiked Acid Game Design Document", which helped inform this document.
 
@@ -39,7 +41,7 @@ Level 1 contains large box's flying enemy robots.
 ### level 2 
 Level 2 contains medium box's spiders.
 ### level 3
-Level 3 contains medium box's spiders.
+Level 3 contains small box's spiders.
 
 ## Controls
 * SPACE -> jump. The longer you hold the button the higher you jump

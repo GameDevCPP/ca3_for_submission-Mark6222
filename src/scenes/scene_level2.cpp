@@ -44,7 +44,8 @@ void Level2Scene::Load() {
         s->setTexure(std::make_shared<Texture>(spritesheet2));
         s->setTexureRect(0, 0, 27, 26);
         s->getSprite().setOrigin(27 / 2.0f, 26 / 2.0f);
-        player->addComponent<PlayerPhysicsComponent>(Vector2f(26.f, 26.f));
+        auto p = player->addComponent<PlayerPhysicsComponent>(Vector2f(26.f, 26.f));
+        p->init("res/player.csv");
         player->addComponent<ShootingComponent>();
         auto h = player->addComponent<Health>();
         h->setHealth(10, "player");
