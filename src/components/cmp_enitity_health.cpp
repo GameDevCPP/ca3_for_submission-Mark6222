@@ -16,6 +16,9 @@ void Health::update(double dt) {
 
 void Health::collisionDetected(std::string group, std::string mask) {
     std::cout << "Collision detected group: " << group << " mask: " << mask << " _group: " << _group << std::endl;
+    if (mask == "spider" && group == "player" && _group == "player") {
+        _health = _health - 1;
+    }
     if (mask == "enemy" && group == "player") {
         _health = _health - 1;
     }

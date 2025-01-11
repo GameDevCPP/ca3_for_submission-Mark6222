@@ -34,7 +34,7 @@ MenuScene menu;
 // std::shared_ptr<sf::SoundBuffer> backgroundMusic = make_shared<SoundBuffer>();;
 int main() {
     resolution = Vector2i(720, 1280);
-    volume = 20;
+    volume = 5;
     bool loaded = AudioManager::playMusic("background.wav", true);
     loaded = AudioManager::loadSound("blaze", "blaze.wav");
     loaded = AudioManager::loadSound("jump", "jump.wav");
@@ -43,7 +43,11 @@ int main() {
         std::cerr << "Failed to load sound: blaze.wav" << std::endl;
     }
     AudioManager::setMusicVolume(volume);
+    AudioManager::setSoundVolume("blaze", volume);
+    AudioManager::setSoundVolume("jump", volume);
+    AudioManager::setSoundVolume("landed", volume);
+
     cout << "MenuScene Loaded!2222" << endl;
 
-    Engine::Start(gameWidth, gameHeight, "Platformer", &menu);
+    Engine::Start(gameWidth, gameHeight, "Platformer", &level3);
 }

@@ -21,7 +21,6 @@ extern vector<shared_ptr<Entity> > drones;
 Texture spritesheet3;
 Texture droneSpritesheet3;
 Texture spiderSpritesheet3;
-
 void Level3Scene::Load() {
     cout << "Scene 3 Load" << endl;
     ls::loadLevelFile("res/level_3.txt", 40.0f);
@@ -55,7 +54,7 @@ void Level3Scene::Load() {
         kills->setPosition(sf::Vector2f(60, gameHeight - 80));
         auto pos = ls::findTiles(ls::START)[0];
         auto t = kills->addComponent<TextComponent>("Health: ");
-        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green);
+        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green, fontSize);
     }
     {
         // create enmey
@@ -119,19 +118,19 @@ float startTime = 0;
 void Level3Scene::Update(const double &dt) {
     Color red = Color::Red;
     kills->GetCompatibleComponent<TextComponent>()[0]->SetText(
-        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red);
+        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     for (auto drone: drones) {
         drone->GetCompatibleComponent<TextComponent>()[0]->SetText(
-            std::to_string(drone->GetCompatibleComponent<Health>()[0]->_health), red);
+            std::to_string(drone->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     }
     for (const auto &spider: spiders) {
         spider->GetCompatibleComponent<TextComponent>()[0]->SetText(
-            std::to_string(spider->GetCompatibleComponent<Health>()[0]->_health), red);
+            std::to_string(spider->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     }
     Scene::Update(dt);
     const auto pp = player->getPosition();
     if (ls::getTileAt(pp) == ls::END) {
-        Engine::ChangeScene((Scene *) &level1);
+        Engine::ChangeScene((Scene *) &menu);
     } else if (!player->isAlive()) {
         Engine::ChangeScene((Scene *) &level3);
     }

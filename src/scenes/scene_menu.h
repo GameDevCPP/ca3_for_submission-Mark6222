@@ -19,6 +19,8 @@ public:
 
   std::shared_ptr<Entity> btnExit;
   std::shared_ptr<Entity> btnStart;
+  std::shared_ptr<Entity> title;
+
   sf::Sprite background;
 
   Font font;

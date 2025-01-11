@@ -17,6 +17,9 @@ public:
   std::vector<std::shared_ptr<Entity>> drones;  void Load() override;
   std::vector<std::shared_ptr<Entity>> spiders;
   std::shared_ptr<Entity> kills;
+
+  int fontSize = 1;
+
   void UnLoad() override;
 
   void Update(const double& dt) override;

@@ -16,8 +16,9 @@ TextComponent::TextComponent(Entity* const p, const std::string& str)
   _text.setFont(*_font);
 }
 
-void TextComponent::SetText(const std::string& str, sf::Color color) {
+void TextComponent::SetText(const std::string& str, sf::Color color, int fontSize) {
   _string = str;
   _text.setString(_string);
   _text.setFillColor(color);
+  _text.setScale(fontSize, fontSize);
 }

@@ -16,14 +16,11 @@ void MenuScene::Load() {
     background.setTexture(*backTexture);
     background.setPosition(-200, 0);
     background.setScale(1.0f, 1.35f);
-
-    text.setFont(*Resources::get<sf::Font>("RobotoMono-Regular.ttf"));
-    text.setCharacterSize(50);
-    text.setFillColor(Color::Yellow);
-    text.setPosition(gameWidth * 0.3f - text.getLocalBounds().width * 0.5f,
-                     gameHeight * 0.5f - text.getLocalBounds().height * 0.5f);
-    text.setString("press space to start");
-
+    title = makeEntity();
+    Color yellow = Color::Yellow;
+    auto Title = title->addComponent<TextComponent>();
+    Title->SetText("WareHouse Jump", yellow, 2);
+    title->setPosition(sf::Vector2f((gameWidth / 2) - 250, (gameHeight / 2) - 350));
     btnStart = makeEntity();
     auto btn1Pos = Vector2f(menuView.getSize().x / 2.0f, menuView.getSize().y / 3.f);
     auto button1 = btnStart->addComponent<Button>(btn1Pos, "Play", sf::Color::Magenta, sf::Color::Yellow, sf::Color::Red);

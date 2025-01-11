@@ -17,7 +17,8 @@ protected:
 	std::shared_ptr<sf::Sound> soundHit;
 	string _groupType;
 	string _mask;
-
+	string bullet = "bullet";
+	bool isMarkedDestroy = false;
 	EntityManager level;
 	double elapsedTime = 0.0;
 

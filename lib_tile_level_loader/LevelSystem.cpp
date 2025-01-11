@@ -193,7 +193,8 @@ std::vector<Vector2ul> LevelSystem::findTiles(LevelSystem::Tile tileType) {
 LevelSystem::Tile LevelSystem::getTileAt(Vector2f v) {
     auto a = v - _offset;
     if (a.x < 0 || a.y < 0) {
-        throw string("Tile out of range ");
+        std::cerr << "Error: Tile out of range. Position: (" << a.x << ", " << a.y << ")" << std::endl;
+        throw std::string("Tile out of range");
     }
     return getTile(Vector2ul((v - _offset) / (_tileSize)));
 }

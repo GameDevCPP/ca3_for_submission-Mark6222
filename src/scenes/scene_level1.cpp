@@ -22,6 +22,7 @@ extern shared_ptr<Entity> kills;
 
 Texture spritesheet;
 Texture droneSpritesheet;
+
 void Level1Scene::Load() {
     Engine::_activeScene->ents.list.clear();
     level2.ents.list.clear();
@@ -59,7 +60,7 @@ void Level1Scene::Load() {
         kills->setPosition(sf::Vector2f(60, gameHeight - 80));
         auto pos = ls::findTiles(ls::START)[0];
         auto t = kills->addComponent<TextComponent>("Health: ");
-        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green);
+        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green, fontSize);
     } {
         // create enmey
         if (!droneSpritesheet.loadFromFile("res/img/Drone2.png")) {
@@ -118,10 +119,10 @@ void Level1Scene::UnLoad() {
 void Level1Scene::Update(const double &dt) {
     Color red = Color::Red;
     kills->GetCompatibleComponent<TextComponent>()[0]->SetText(
-        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red);
+        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     for (auto drone: drones) {
         drone->GetCompatibleComponent<TextComponent>()[0]->SetText(
-            std::to_string(drone->GetCompatibleComponent<Health>()[0]->_health), red);
+            std::to_string(drone->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     }
     if (ls::getTileAt(player->getPosition()) == ls::END) {
         level2.UnLoad();

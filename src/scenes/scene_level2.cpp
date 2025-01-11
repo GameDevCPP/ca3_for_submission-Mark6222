@@ -49,14 +49,14 @@ void Level2Scene::Load() {
         auto h = player->addComponent<Health>();
         h->setHealth(10, "player");
         auto c = player->addComponent<CollisionComponent>();
-        c->setCollision("player", "enemy", e);
+        c->setCollision("player", "spider", e);
     } {
         kills = makeEntity();
         kills->addTag("kills");
         kills->setPosition(sf::Vector2f(60, gameHeight - 80));
         auto pos = ls::findTiles(ls::START)[0];
         auto t = kills->addComponent<TextComponent>("Health: ");
-        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green);
+        t->SetText("Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), green, fontSize);
     } {
         // create enmey
         if (!spiderSpritesheet2.loadFromFile("res/img/spider2.png")) {
@@ -125,10 +125,10 @@ void Level2Scene::Update(const double &dt) {
     }
     Color red = Color::Red;
     kills->GetCompatibleComponent<TextComponent>()[0]->SetText(
-        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red);
+        "Health: " + std::to_string(player->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     for (const auto &spider: spiders) {
         spider->GetCompatibleComponent<TextComponent>()[0]->SetText(
-            std::to_string(spider->GetCompatibleComponent<Health>()[0]->_health), red);
+            std::to_string(spider->GetCompatibleComponent<Health>()[0]->_health), red, fontSize);
     }
     if (ls::getTileAt(pp) == ls::END) {
         Engine::ChangeScene((Scene *) &level3);
